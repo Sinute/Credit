@@ -1,0 +1,53 @@
+<div class="row">
+  <table class="table table-bordered table-hover table-condensed" id="accounts-form">
+    <thead>
+      <tr>
+        <th>Account</th>
+        <th>Site</th>
+        <th>Create Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($accounts as $account): ?>
+        <tr>
+          <td><?php echo $account['account'] ?></td>
+          <td><?php echo $sites[$account['site_id']]['name'] ?></td>
+          <td><?php echo $account['create_time'] ?></td>
+          <td>
+            <?php if ($account['enabled']): ?>
+              <button class="btn btn-xs btn-success account-enable-btn" data-id="<?php echo $account['id']?>" data-enable="0">Enabled</button>
+            <?php else: ?>
+              <button class="btn btn-xs btn-danger account-enable-btn" data-id="<?php echo $account['id']?>" data-enable="1">Disabled</button>
+            <?php endif; ?>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
+<script>
+  $(function(){
+    $(document).delegate('.account-enable-btn', 'click', function(){
+      var self = this;
+      ajaxCall(self, '<?php echo SP::getBaseUrl() ?>/Admin/EnableAccount', {id: $(self).data('id'), enable: $(self).data('enable')},
+        function(result){
+          if($(self).data('enable')) {
+            $(self).data('enable', 0)
+              .removeClass('btn-danger')
+              .addClass('btn-success')
+              .text('Enabled');
+          }else{
+            $(self).data('enable', 1)
+              .removeClass('btn-success')
+              .addClass('btn-danger')
+              .text('Disabled');
+          }
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    });
+  });
+</script>

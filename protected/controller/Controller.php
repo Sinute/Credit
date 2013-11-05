@@ -4,15 +4,11 @@
 */
 class Controller extends BaseController
 {
-	protected $__roles = array(
-		'admin' => 0xFFFF,
-		);
+	const ROLE_MEMBER = 0x1;
+	const ROLE_ADMIN  = 0xFFFF;
 
-	protected function __checkPrivilege($level)
+	static public function checkPrivilege($level)
 	{
 		return (SP::PUser()->level & $level) == $level;
-		// return function($user) use($level) {
-		// 	return ($user->level & $level) == $level;
-		// };
 	}
 }

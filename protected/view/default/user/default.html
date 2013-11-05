@@ -1,0 +1,113 @@
+<div class="row">
+  <form class="form-inline" role="form" id="add-account-form">
+    <div class="form-group">
+      <label class="sr-only" for="account">Account</label>
+      <input type="text" class="form-control" id="account" placeholder="Account" name="account">
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="password">Password</label>
+      <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="site-selector">Site</label>
+      <select class="form-control" id="site-selector" name="siteId">
+        <?php foreach ($sites as $siteId => $site): ?>
+          <option value="<?php echo $siteId ?>"><?php echo $site['name'] ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <button class="btn btn-default add-account-btn">Add</button>
+  </form>
+</div>
+<hr>
+<div class="row">
+  <table class="table table-bordered table-hover table-condensed" id="accounts-form">
+    <thead>
+      <tr>
+        <th>Account</th>
+        <th>Site</th>
+        <th>Create Time</th>
+        <th>Status</th>
+        <th>Operate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($accounts as $account): ?>
+        <tr>
+          <td><?php echo $account['account'] ?></td>
+          <td><?php echo $sites[$account['site_id']]['name'] ?></td>
+          <td><?php echo $account['create_time'] ?></td>
+          <td>
+            <?php if($account['enabled']): ?>
+              <span class="label label-success" style="line-height: inherit;">Enabled</span>
+            <?php else: ?>
+              <span class="label label-danger" style="line-height: inherit;">Disabled</span>
+            <?php endif; ?>
+          </td>
+          <td>
+            <button class="btn btn-xs btn-default account-detail-btn" data-id="<?php echo $account['id']?>">Detail</button>
+            <button class="btn btn-xs btn-danger del-account-btn" data-id="<?php echo $account['id']?>">Del</button>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
+<script>
+  $(function(){
+    $(document).delegate('.add-account-btn', 'click', function(){
+      ajaxCall(this, '<?php echo SP::getBaseUrl() ?>/User/AddAccount', $("#add-account-form").serialize(),
+        function(result){
+          var tr = $('<tr>');
+          tr.append($('<td>').text(result.account))
+            .append($('<td>').text(result.siteName))
+            .append($('<td>').text(result.createTime))
+            .append($('<td>')
+              .append($('<span>').addClass('label label-danger')
+                .css('line-height', 'inherit')
+                .text('Disabled')
+                )
+              )
+            .append($('<td>')
+              .append($('<button>').addClass('btn btn-xs btn-default account-detail-btn')
+                .data('id', result.accountId)
+                .text('Detail')
+                )
+              .append(' ')
+              .append($('<button>').addClass('btn btn-xs btn-danger del-account-btn')
+                .data('id', result.accountId)
+                .text('Del')
+                )
+            );
+          $("#accounts-form tbody").prepend(tr);
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    })
+    .delegate('.del-account-btn', 'click', function(){
+      if(!confirm('确认删除？')) return false;
+      var self = this;
+      ajaxCall(self, '<?php echo SP::getBaseUrl() ?>/User/DelAccount', {id: $(self).data("id")},
+        function(result){
+          $(self).parent().parent().remove();
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    })
+    .delegate('.account-detail-btn', 'click', function(){
+      var self = this;
+      ajaxCall(self, '<?php echo SP::getBaseUrl() ?>/User/AccountDetail', {id: $(self).data("id")},
+        function(result){
+          alert(result.info);
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    });
+  });
+</script>

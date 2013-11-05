@@ -2,7 +2,7 @@
 return array(
 	'urlFormat'=>'path',
 	'rules'=>array(
-		''=>'Index/Default',
+		''=>'Index/Signin',
 		'<c:\w+>'=>'<c>/Default',
 		'<c:\w+>/<a:\w+>/*'=>'<c>/<a>',
 	),

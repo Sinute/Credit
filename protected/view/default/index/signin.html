@@ -1,6 +1,6 @@
-<link rel="stylesheet" type="text/css" href="<?php echo SP::staticFile(); ?>/css/signin.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo SP::staticFile('css/signin.css'); ?>" />
 <div class="container">
-  <form class="form-signin" id="signin-form" action="<?php echo SP::staticFile(); ?>/Index/Signin" method="post">
+  <form class="form-signin" id="signin-form" action="<?php echo SP::staticFile('Index/Signin'); ?>" method="post">
     <h2 class="form-signin-heading"><?php echo 'Sign in'; ?></h2>
     <input class="form-control" placeholder="<?php echo 'account'; ?>" name="account" id="account" type="text" />
     <input class="form-control" placeholder="<?php echo 'password'; ?>" name="password" id="password" type="password" />
@@ -9,12 +9,7 @@
       <input name="rememberMe" id="remember-me" value="1" type="checkbox" /><?php echo 'Remember me next time'; ?>
     </label>
     </div>
-    <input type="hidden" id="type" name="login" value="1">
+    <input type="hidden" id="type" name="signin" value="1">
     <button class="btn btn-lg btn-primary btn-block signin"><?php echo 'Sign in'; ?></button>
-    <button class="btn btn-lg btn-danger btn-block signup"><?php echo 'Sign up'; ?></button>
   </form>
 </div> <!-- /container -->
-<script>
-  // $(".signin").click(function(){$("#type").attr("name","login");$("#login-form").submit();});
-  // $(".signup").click(function(){$("#type").attr("name","signup");$("#login-form").submit();});
-</script>

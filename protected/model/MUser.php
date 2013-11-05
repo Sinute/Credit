@@ -40,6 +40,18 @@ class MUser extends Model
 			);
 	}
 
+	public function getAll()
+	{
+		return SP::PDB()->getAll('SELECT `id`, `account`, `name`, `email`, `level`, `enabled`, `create_time` FROM `user` ORDER BY `create_time` DESC');
+	}
+
+	public function del($id)
+	{
+		$maccount = new MAccount;
+		$maccount->delByUserId($id);
+		return SP::PDB()->execute('DELETE FROM `user` WHERE `id` = :id', array(':id'=>$id));
+	}
+
 	public function signup($account, $password, $email)
 	{
 		return SP::PDB()->insert(
@@ -67,5 +79,15 @@ class MUser extends Model
 			'UPDATE `user` SET `password` = :password WHERE `id` = :id',
 			array(':password'=>$this->__crypt($newPassword), ':id'=>SP::PUser()->id)
 			);
+	}
+
+	public function enable($id, $enable)
+	{
+		if(!$enable)
+		{
+			$maccount = new MAccount;
+			$maccount->enableByUid($id, $enable);
+		}
+		return SP::PDB()->execute('UPDATE `user` SET `enabled` = :enable WHERE `id` = :id', array(':enable' => $enable ? 1 : 0, ':id' => $id));
 	}
 }

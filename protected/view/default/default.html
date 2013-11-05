@@ -1,10 +1,92 @@
-<!doctype html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Hello World</title>
-</head>
-<body>
-	<?php echo $content;?>
-</body>
+<?php
+$menu = array(
+  array('href'=>SP::getBaseUrl().'/User','text'=>'Account','display'=>Controller::checkPrivilege(Controller::ROLE_MEMBER)),
+  array('href'=>SP::getBaseUrl().'/Admin/Site','text'=>'Site','display'=>Controller::checkPrivilege(Controller::ROLE_ADMIN)),
+  array('href'=>SP::getBaseUrl().'/Admin/User','text'=>'User','display'=>Controller::checkPrivilege(Controller::ROLE_ADMIN)),
+  );
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="<?php echo SP::staticFile('css/bootstrap.min.css'); ?>" />
+    <link rel="stylesheet" type="text/css" href="<?php echo SP::staticFile('css/common.css'); ?>" />
+    <script src="<?php echo SP::staticFile('js/jquery-1.10.2.min.js'); ?>"></script>
+
+    <title><?php echo $this->getTitle(); ?></title>
+  </head>
+
+  <body>
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="<?php echo SP::getBaseUrl().'/User' ?>"><?php echo SP::getAppName()?></a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <?php foreach ($menu as $li): ?>
+              <?php if ($li['display']): ?>
+                <li><a href="<?php echo $li['href']?>"><?php echo $li['text']?></a></li>
+              <?php endif; ?>
+            <?php endforeach; ?>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?php echo SP::PUser()->name?> <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="<?php echo SP::getBaseUrl().'/User/Profile' ?>">Profile</a></li>
+                <li class="divider"></li>
+                <li><a href="<?php echo SP::getBaseUrl().'/User/Signout' ?>">Signout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+    <div class="container">
+      <?php echo $content; ?>
+    </div>
+    <script src="<?php echo SP::staticFile('js/bootstrap.min.js'); ?>"></script>
+    <script>
+      function ajaxLoading(flag) {
+        if(flag == undefined) return $("#loading").is(":visible");
+        $("#loading").toggle(flag);
+        return flag;
+      };
+      var ajaxCall = (function() {
+        return function (dom, url, data, successCallback, errorCallback) {
+          if(ajaxLoading() || $(dom).hasClass('disabled')) return;
+          ajaxLoading(true);
+          $(dom).addClass('disabled');
+          $.ajax({
+            type: 'POST',
+            url: url,
+            data: data,
+            timeout: 10000,
+            success: function(data, textStatus, jqXHR) {
+              if (typeof successCallback == "function") {
+                successCallback(data, textStatus, jqXHR);
+                $(dom).removeClass('disabled');
+                ajaxLoading(false);
+              }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              if (typeof errorCallback == "function") {
+                errorCallback(JSON.parse(jqXHR.responseText), jqXHR, textStatus, errorThrown);
+                $(dom).removeClass('disabled');
+                ajaxLoading(false);
+              }
+            },
+            dataType: "json"
+          })
+        };
+      })();
+    </script>
+  </body>
 </html>

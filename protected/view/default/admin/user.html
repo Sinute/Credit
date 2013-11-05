@@ -1,0 +1,120 @@
+<div class="row">
+  <form class="form-inline" role="form" id="add-user-form">
+    <div class="form-group">
+      <label class="sr-only" for="account">Account</label>
+      <input type="text" class="form-control" id="account" placeholder="Account" name="account">
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="password">Password</label>
+      <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="email">Email</label>
+      <input type="email" class="form-control" id="email" placeholder="Email" name="email">
+    </div>
+    <button class="btn btn-default add-user-btn">Add</button>
+  </form>
+</div>
+<hr>
+<div class="row">
+  <table class="table table-bordered table-hover table-condensed" id="users-form">
+    <thead>
+      <tr>
+        <th>Account</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Level</th>
+        <th>Create Time</th>
+        <th>Status</th>
+        <th>Operate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($users as $user): ?>
+        <tr>
+          <td><a class="btn btn-default btn-xs" href="<?php echo SP::getBaseUrl() ?>/Admin/Account/uid/<?php echo $user['id']?>" target="_blank"><?php echo $user['account'] ?></a></td>
+          <td><?php echo $user['name'] ?></td>
+          <td><?php echo $user['email'] ?></td>
+          <td><?php echo $user['level'] ?></td>
+          <td><?php echo $user['create_time'] ?></td>
+          <td>
+            <?php if ($user['enabled']): ?>
+              <button class="btn btn-xs btn-success user-enable-btn" data-id="<?php echo $user['id']?>" data-enable="0">Enabled</button>
+            <?php else: ?>
+              <button class="btn btn-xs btn-danger user-enable-btn" data-id="<?php echo $user['id']?>" data-enable="1">Disabled</button>
+            <?php endif; ?>
+          </td>
+          <td>
+            <button class="btn btn-xs btn-danger del-user-btn" data-id="<?php echo $user['id']?>">Del</button>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
+<script>
+  $(function(){
+    $(document).delegate('.add-user-btn', 'click', function(){
+      ajaxCall(this, '<?php echo SP::getBaseUrl() ?>/Admin/Signup', $("#add-user-form").serialize(),
+        function(result){
+          var tr = $('<tr>');
+          tr.append($('<td>')
+              .append($('<a>').addClass('btn btn-default btn-xs')
+                .attr('href', '<?php echo SP::getBaseUrl() ?>/Admin/Account/uid/'+result.userId)
+                .attr('target', '_blank')
+                .text(result.account)
+                )
+              )
+            .append($('<td>').text(result.name))
+            .append($('<td>').text(result.email))
+            .append($('<td>').text(result.level))
+            .append($('<td>').text(result.createTime))
+            .append($('<td>')
+              .append($('<button>').addClass('btn btn-xs btn-success user-enable-btn')
+                .data('id', result.userId)
+                .data('enable', 0)
+                .text('Enabled')
+                )
+            )
+            .append($('<td>')
+              .append($('<button>').addClass('btn btn-xs btn-danger del-user-btn')
+                .data('id', result.userId)
+                .text('Del')
+                )
+            );
+          $("#users-form tbody").prepend(tr);
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    })
+    .delegate('.user-enable-btn', 'click', function(){
+      var self = this;
+      ajaxCall(self, '<?php echo SP::getBaseUrl() ?>/Admin/EnableUser', {id: $(self).data("id"), enable: $(self).data("enable")},
+        function(result){
+          if($(self).data("enable")) {
+            $(self).removeClass('btn-danger').addClass('btn-success').text('Enabled').data('enable', 0);
+          }else{
+            $(self).removeClass('btn-success').addClass('btn-danger').text('Disabled').data('enable', 1);
+          }
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    })
+    .delegate('.del-user-btn', 'click', function(){
+      if(!confirm('确认删除？')) return false;
+      var self = this;
+      ajaxCall(self, '<?php echo SP::getBaseUrl() ?>/Admin/DelUser', {id: $(self).data("id")},
+        function(result){
+          $(self).parent().parent().remove();
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    });
+  });
+</script>
