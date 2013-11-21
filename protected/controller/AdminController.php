@@ -135,4 +135,15 @@ class AdminController extends Controller
 		call_user_func_array(array(new $model, $method), $params);
 		SP::PRender('Debug');
 	}
+
+	public function AccountDetailAction($id)
+	{
+		SP::PValidator($id)->check('type', 'int', '参数错误')
+			->check('compare', array('>'=>0), '参数错误');
+		$maccount = new MAccount;
+		$account = $maccount->get($id);
+		if(!($info = MRequest::getCreditInfo($account['site_id'], $account['account']))) throw new HttpException("暂无详细");
+
+		SP::PRender('Account Detail', false, compact('info'));
+	}
 }

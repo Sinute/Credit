@@ -6,6 +6,7 @@
         <th>Site</th>
         <th>Create Time</th>
         <th>Status</th>
+        <th>Operate</th>
       </tr>
     </thead>
     <tbody>
@@ -20,6 +21,9 @@
             <?php else: ?>
               <button class="btn btn-xs btn-danger account-enable-btn" data-id="<?php echo $account['id']?>" data-enable="1">Disabled</button>
             <?php endif; ?>
+          </td>
+          <td>
+            <button class="btn btn-xs btn-default account-detail-btn" data-id="<?php echo $account['id']?>">Detail</button>
           </td>
         </tr>
       <?php endforeach; ?>
@@ -43,6 +47,17 @@
               .addClass('btn-danger')
               .text('Disabled');
           }
+        },
+        function(result){
+          alert(result.msg);
+        });
+      return false;
+    })
+    .delegate('.account-detail-btn', 'click', function(){
+      var self = this;
+      ajaxCall(self, '<?php echo SP::getBaseUrl() ?>/Admin/AccountDetail', {id: $(self).data("id")},
+        function(result){
+          alert(result.info);
         },
         function(result){
           alert(result.msg);
