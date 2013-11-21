@@ -83,7 +83,7 @@ class MAccount extends Model
 		if($result)
 		{
 			$account = $this->get($id);
-			$this->flushAllByUid($account['uid']);
+			$this->flushAllByUid($account['user_id']);
 		}
 		return $result;
 	}
